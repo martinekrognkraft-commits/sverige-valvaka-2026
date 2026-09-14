@@ -17,6 +17,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Unpack Android project
+        run: |
+          unzip -q -o Sverige_Valvaka_2026_Android_Project_v3_4.zip -x '.github/*'
+          test -f app/build.gradle
+          test -f tools/build_geo.py
+          test -f web/static/app.js
+          echo "Project unpacked successfully"
+
       - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
@@ -54,12 +62,8 @@ jobs:
           cp web/index.html app/src/main/assets/www/index.html
           cp web/static/styles.css app/src/main/assets/www/static/styles.css
           cp web/static/app.js app/src/main/assets/www/static/app.js
-          curl --fail --location --retry 3 \
-            https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js \
-            --output app/src/main/assets/www/static/maplibre-gl.js
-          curl --fail --location --retry 3 \
-            https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css \
-            --output app/src/main/assets/www/static/maplibre-gl.css
+          curl --fail --location --retry 3             https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js             --output app/src/main/assets/www/static/maplibre-gl.js
+          curl --fail --location --retry 3             https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css             --output app/src/main/assets/www/static/maplibre-gl.css
 
       - name: Build debug APK
         run: gradle --no-daemon :app:assembleDebug
