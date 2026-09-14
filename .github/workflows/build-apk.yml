@@ -19,7 +19,7 @@ jobs:
 
       - name: Unpack Android project
         run: |
-          unzip -q -o Sverige_Valvaka_2026_Android_Project_v3_1.zip -x '.github/*'
+          unzip -q -o Sverige_Valvaka_2026_Android_Project_v3_2.zip -x '.github/*'
 
       - name: Set up Java 17
         uses: actions/setup-java@v4
@@ -45,10 +45,10 @@ jobs:
         with:
           gradle-version: '8.13'
 
-      - name: Build map assets from Valmyndigheten
+      - name: Build map and water assets
         run: |
           python -m pip install --upgrade pip
-          python -m pip install shapely pyproj
+          python -m pip install shapely pyproj pyshp
           rm -rf app/src/main/assets
           mkdir -p app/src/main/assets/geo app/src/main/assets/www/static
           python tools/build_geo.py --out app/src/main/assets/geo
@@ -58,8 +58,12 @@ jobs:
           cp web/index.html app/src/main/assets/www/index.html
           cp web/static/styles.css app/src/main/assets/www/static/styles.css
           cp web/static/app.js app/src/main/assets/www/static/app.js
-          curl --fail --location --retry 3             https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js             --output app/src/main/assets/www/static/maplibre-gl.js
-          curl --fail --location --retry 3             https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css             --output app/src/main/assets/www/static/maplibre-gl.css
+          curl --fail --location --retry 3 \
+            https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js \
+            --output app/src/main/assets/www/static/maplibre-gl.js
+          curl --fail --location --retry 3 \
+            https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css \
+            --output app/src/main/assets/www/static/maplibre-gl.css
 
       - name: Build debug APK
         run: gradle --no-daemon :app:assembleDebug
@@ -67,13 +71,13 @@ jobs:
       - name: Rename APK
         run: |
           mkdir -p dist
-          cp app/build/outputs/apk/debug/app-debug.apk dist/Sverige-Valvaka-2026-v3.1-debug.apk
+          cp app/build/outputs/apk/debug/app-debug.apk dist/Sverige-Valvaka-2026-v3.2-debug.apk
           ls -lh dist/
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: Sverige-Valvaka-2026-APK
-          path: dist/Sverige-Valvaka-2026-v3.1-debug.apk
+          path: dist/Sverige-Valvaka-2026-v3.2-debug.apk
           if-no-files-found: error
           retention-days: 30
